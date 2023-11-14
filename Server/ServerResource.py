@@ -8,9 +8,10 @@ import socket
 import sys
 from _thread import *
 
-from Constantes.Respostas import Repostas
+from Utils.Respostas import Respostas
 from Repository.banco_de_dados import *
 from Server.RequisicoesServer import manipula_requisicoes
+from Utils.SocketUtils import *
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
@@ -48,7 +49,7 @@ BUFFER_SIZE = 4096
 
 
 def gerenciar_cliente_thread(conexao, _endereco):
-    conexao.send(str.encode(Repostas.CONNECTED.value))
+    sendString( conexao, Respostas.CONNECTED.value )
     while True:
         dados = conexao.recv(BUFFER_SIZE)
         requisicao = dados.decode('utf-8')

@@ -6,8 +6,8 @@
 
 from Client.Client import requisicao_cadastro, requisicao_login, requisicao_saque, requisicao_deposito, \
     requisicao_transferencia, requisicao_consultar_saldo
-from Constantes.Requisicoes import Requisicoes
-from Constantes.Respostas import Repostas
+from Utils.Requisicoes import Requisicoes
+from Utils.Respostas import Respostas
 from models.Cliente import Cliente
 
 
@@ -31,7 +31,7 @@ def switch_main_menu(opcao, count_event):
         count_event += 1
         rg_cliente, senha_cliente = digitar_informacoes_login()
         resposta_requisicao, nome_cliente, saldo_cliente = requisicao_login(rg_cliente, senha_cliente)
-        if resposta_requisicao == Repostas.SUCCESS:
+        if resposta_requisicao == Respostas.SUCCESS:
             count_event = menu_sessao(rg_cliente, count_event)
             return count_event, True
         else:
