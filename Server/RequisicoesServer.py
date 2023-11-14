@@ -3,8 +3,8 @@
 @author: Carlos Mosselman Cabral Neto
 @author: Vanessa Machado Araújo
 """
-from Constantes.Requisicoes import Requisicoes
-from Constantes.Respostas import Repostas
+from Utils.Requisicoes import Requisicoes
+from Utils.Respostas import Respostas
 from Repository.banco_de_dados import criar_cliente, get_saldo, atualizar_saldo, \
     verifica_por_rg_senha, get_nome_cliente
 from models.Cliente import Cliente
@@ -49,7 +49,7 @@ def cadastro(conexao, cabecalho):
         rg=cabecalho[2],
         senha=cabecalho[3])
     criar_cliente(cliente)
-    conexao.send(str.encode(Repostas.SUCCESS.value))
+    conexao.send(str.encode(Respostas.SUCCESS.value))
 
 
 def saldo_cliente(conexao, cabecalho):
@@ -57,7 +57,7 @@ def saldo_cliente(conexao, cabecalho):
     - Consulta o saldo do cliente
     """
     saldo = get_saldo(cabecalho[1])
-    conexao.send(str.encode(Repostas.SUCCESS.value + '#' + str(saldo)))
+    conexao.send(str.encode(Respostas.SUCCESS.value + '#' + str(saldo)))
 
 
 def transferencia(conexao, cabecalho):
@@ -70,13 +70,13 @@ def transferencia(conexao, cabecalho):
     saldo_atual = get_saldo(rg)
     saldo_atual_favorecido = get_saldo(rg_favorecido)
     if saldo_atual < valor:
-        conexao.send(str.encode(Repostas.FORBIDDEN.value + '#' + 'Saldo insuficiente'))
+        conexao.send(str.encode(Respostas.FORBIDDEN.value + '#' + 'Saldo insuficiente'))
     else:
         saldo_novo = saldo_atual - valor
         atualizar_saldo(saldo_novo, rg)
         saldo_novo_favorecido = saldo_atual_favorecido + valor
         atualizar_saldo(saldo_novo_favorecido, rg_favorecido)
-        conexao.send(str.encode(Repostas.SUCCESS.value + '#' + str(saldo_novo) + '#' + str(saldo_novo_favorecido)))
+        conexao.send(str.encode(Respostas.SUCCESS.value + '#' + str(saldo_novo) + '#' + str(saldo_novo_favorecido)))
 
 
 def deposito(conexao, cabecalho):
@@ -88,7 +88,7 @@ def deposito(conexao, cabecalho):
     saldo_atual = get_saldo(rg)
     saldo_novo = saldo_atual + valor
     atualizar_saldo(saldo_novo, rg)
-    conexao.send(str.encode(Repostas.SUCCESS.value + '#' + str(saldo_novo)))
+    conexao.send(str.encode(Respostas.SUCCESS.value + '#' + str(saldo_novo)))
 
 
 def saque(conexao, cabecalho):
@@ -99,11 +99,11 @@ def saque(conexao, cabecalho):
     rg = cabecalho[2]
     saldo_atual = get_saldo(rg)
     if saldo_atual < valor:
-        conexao.send(str.encode(Repostas.FORBIDDEN.value + '#' + 'Saldo insuficiente'))
+        conexao.send(str.encode(Respostas.FORBIDDEN.value + '#' + 'Saldo insuficiente'))
     else:
         saldo_novo = saldo_atual - valor
         atualizar_saldo(saldo_novo, rg)
-        conexao.send(str.encode(Repostas.SUCCESS.value + '#' + str(saldo_novo)))
+        conexao.send(str.encode(Respostas.SUCCESS.value + '#' + str(saldo_novo)))
 
 
 def login(conexao, cabecalho):
@@ -112,6 +112,6 @@ def login(conexao, cabecalho):
     """
     if not verifica_por_rg_senha(rg=cabecalho[1], senha=cabecalho[2]):
         cliente_nome, cliente_saldo = get_nome_cliente(rg=cabecalho[1])
-        conexao.send(str.encode(Repostas.SUCCESS.value + '#' + cliente_nome + '#' + str(cliente_saldo)))
+        conexao.send(str.encode(Respostas.SUCCESS.value + '#' + cliente_nome + '#' + str(cliente_saldo)))
     else:
-        conexao.send(str.encode(Repostas.FORBIDDEN.value, 'Dados de usuário incorretos'))
+        conexao.send(str.encode(Respostas.FORBIDDEN.value, 'Dados de usuário incorretos'))
