@@ -14,9 +14,10 @@ class Client:
     MENSAGEM_ERRO_DESCONHECIDO = 'Erro desconhecido'
     MENSAGEM_SERVIDOR_SEM_RESPOSTA = 'Erro de conexão com o servidor: sem resposta'
     
-    def __init__(self, rg, senha, host='127.0.0.1', port=1233):
+    def __init__(self, rg, senha, nome = "", host='127.0.0.1', port=1233):
         self.rg = rg
         self.senha = senha
+        self.nome = nome
         self.host = host
         self.port = port
         self.LogicalClock = 0
@@ -25,15 +26,19 @@ class Client:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             try:
                 client_socket.connect( (self.host, self.port) )
-                if Respostas( receiveString( client_socket ) ) == Respostas.CONNECTED:
+               
+                resposta = receiveString( client_socket ).split('#')
+                self.LogicalClock = max( self.LogicalClock, int( resposta[-1] ) )
+                
+                if Respostas( resposta[0] ) == Respostas.CONNECTED:
 
                     request = Requisicoes.CADASTRO.value + '#' + self.nome + '#' + self.rg + '#' + self.senha
                     
                     resposta = self.request( request, client_socket )
                     
-                    status = Respostas( resposta )
+                    status = Respostas( resposta[0] )
                     if status == Respostas.SUCCESS:
-                        return Respostas.SUCCESS,
+                        return status,
 
                     return status, self.MENSAGEM_ERRO_DESCONHECIDO
 
@@ -53,13 +58,15 @@ class Client:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             try:
                 client_socket.connect((self.host, self.port))
-                if Respostas( receiveString( client_socket ) ) == Respostas.CONNECTED:
+                
+                resposta = receiveString( client_socket ).split('#')
+                self.LogicalClock = max( self.LogicalClock, int( resposta[-1] ) )
+                
+                if Respostas( resposta[0] ) == Respostas.CONNECTED:
 
                     request = Requisicoes.LOGIN.value + '#' + self.rg + '#' + self.senha
 
                     resposta = self.request( request, client_socket )
-
-                    resposta = resposta.split('#')
 
                     status = Respostas( resposta[0] )
 
@@ -67,7 +74,7 @@ class Client:
                         self.nome = resposta[1]
                         self.saldo = resposta[2]
 
-                        return status, self.nome, self.saldo
+                        return status, "Logado"
                     
                     return status, self.MENSAGEM_ERRO_DESCONHECIDO
                 
@@ -87,13 +94,15 @@ class Client:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             try:
                 client_socket.connect((self.host, self.port))
-                if Respostas( receiveString( client_socket ) ) == Respostas.CONNECTED:
+               
+                resposta = receiveString( client_socket ).split('#')
+                self.LogicalClock = max( self.LogicalClock, int( resposta[-1] ) )
+                
+                if Respostas( resposta[0] ) == Respostas.CONNECTED:
 
                     request = Requisicoes.SAQUE.value + '#' + str(valor) + '#' + self.rg
 
                     resposta = self.request( request, client_socket )
-
-                    resposta = resposta.split('#')
 
                     status = Respostas( resposta[0] )
 
@@ -119,13 +128,15 @@ class Client:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             try:
                 client_socket.connect((self.host, self.port))
-                if Respostas(client_socket.recv(self.BUFFER_SIZE).decode('utf-8')) == Respostas.CONNECTED:
+                
+                resposta = receiveString( client_socket ).split('#')
+                self.LogicalClock = max( self.LogicalClock, int( resposta[-1] ) )
+                
+                if Respostas( resposta[0] ) == Respostas.CONNECTED:
 
                     request = Requisicoes.DEPOSITO.value + '#' + str(valor) + '#' + self.rg
 
                     resposta = self.request( request, client_socket )
-
-                    resposta = resposta.split('#')
 
                     status = Respostas( resposta[0] )
                     
@@ -151,13 +162,15 @@ class Client:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             try:
                 client_socket.connect((self.host, self.port))
-                if Respostas(client_socket.recv(self.BUFFER_SIZE).decode('utf-8')) == Respostas.CONNECTED:
+
+                resposta = receiveString( client_socket ).split('#')
+                self.LogicalClock = max( self.LogicalClock, int( resposta[-1] ) )
+
+                if Respostas( resposta[0] ) == Respostas.CONNECTED:
 
                     request = Requisicoes.TRANSFERENCIA.value + '#' + str(valor) + '#' + self.rg + '#' + rg_favorecido
 
                     resposta = self.request( request, client_socket )
-
-                    resposta = resposta.split('#')
 
                     status = Respostas( resposta[0] )
 
@@ -182,14 +195,16 @@ class Client:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             try:
                 client_socket.connect((self.host, self.port))
-                if Respostas(client_socket.recv(self.BUFFER_SIZE).decode('utf-8')) == Respostas.CONNECTED:
+                
+                resposta = receiveString( client_socket ).split('#')
+                self.LogicalClock = max( self.LogicalClock, int( resposta[-1] ) )
+                
+                if Respostas( resposta[0] ) == Respostas.CONNECTED:
 
                     request = Requisicoes.CONSULTA_SALDO.value + '#' + self.rg
 
                     resposta = self.request( request, client_socket )
                    
-                    resposta = resposta.split('#')
-
                     status = Respostas( resposta[0] )
 
                     if status == Respostas.SUCCESS:
@@ -206,10 +221,10 @@ class Client:
     def request(self,  request : str , clientSocket : socket ):
         self.LogicalClock += 1
 
-        sendInt( clientSocket, self.LogicalClock )
-        sendString( clientSocket, request ) 
+        sendString( clientSocket, request + '#' + str( self.LogicalClock ) ) 
         
-        self.LogicalClock = max( self.LogicalClock, receiveInt( clientSocket ) )
         resposta = receiveString( clientSocket )
+        resposta = resposta.split('#')
+        self.LogicalClock = max( self.LogicalClock, int( resposta[-1] ) )
 
         return resposta
