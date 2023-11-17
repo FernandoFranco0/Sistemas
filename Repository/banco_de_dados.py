@@ -58,8 +58,9 @@ def criar_cliente(cliente):
     print("Criacao de cliente")
     with sql.connect('clientes.db') as con:
         cur = con.cursor()
-        info_cliente = (cliente.get_nome(), cliente.get_rg(), cliente.get_senha(), cliente.get_saldo())
-        if not cliente_existe_por_nome(cliente.get_nome()):
+        ( n, r, s ) = cliente
+        info_cliente = (n, r, s, 0)
+        if not cliente_existe_por_nome( n ):
             cur.execute(''' INSERT INTO clientes(nome, rg, senha, saldo) VALUES (?,?,?,?) ''', info_cliente)
         con.commit()
 

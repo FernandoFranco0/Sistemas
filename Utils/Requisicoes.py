@@ -9,8 +9,8 @@ from enum import Enum
 class Requisicoes(Enum):
     LOGIN = '1'
     CADASTRO = '2'
-    SAQUE = '1'
-    DEPOSITO = '2'
-    CONSULTA_SALDO = '3'
-    TRANSFERENCIA = '4'
-    OBTER_LISTA_CLIENTES = '5'
+    SAQUE = '3'
+    DEPOSITO = '4'
+    CONSULTA_SALDO = '5'
+    TRANSFERENCIA = '6'
+    OBTER_LISTA_CLIENTES = '7'

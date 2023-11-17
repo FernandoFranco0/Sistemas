@@ -70,10 +70,10 @@ if __name__ == '__main__':
     while continuar:
         if loggedIn:
             print("Digite o número do que deseja fazer: ")
-            print("1 - Saque")
-            print("2 - Depósito")
-            print("3 - Consultar Saldo")
-            print("4 - Transferência")
+            print("3 - Saque")
+            print("4 - Depósito")
+            print("5 - Consultar Saldo")
+            print("6 - Transferência")
             print("Outro - Sai da Sessão")
             operacao_desejada = input("Opção: ")
 
@@ -88,4 +88,4 @@ if __name__ == '__main__':
             continuar, loggedClient = switch_main_menu(operacao_desejada)
             
         if( loggedClient ):
-            print(f"Relogio do client com rg {loggedClient.rg} = {loggedClient.LogicalClock}")
+            print(f"Relogio do client com rg {loggedClient.rg} : {loggedClient.LogicalClock}")

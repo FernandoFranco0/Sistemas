@@ -3,20 +3,14 @@
 @author: Carlos Mosselman Cabral Neto
 @author: Vanessa Machado Araújo
 """
-import os
+
 import socket
-import sys
 from _thread import *
 
 from Utils.Requisicoes import Requisicoes
 from Utils.Respostas import Respostas
 from Repository.banco_de_dados import *
-from models.Cliente import Cliente
 from Utils.SocketUtils import *
-
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
 
 """ 
 AF_INET = Tipo da família de endereços, que no caso é o host:port
@@ -52,6 +46,7 @@ BUFFER_SIZE = 4096
 class Server:
     def __init__(self, ):
         self.LogicalClock = 0
+
     def manipula_requisicoes(self, cabecalho, conexao):
         """
         :param cabecalho:
@@ -59,18 +54,21 @@ class Server:
         :return:
         - Direciona o tipo de requisição
         """
-        if Requisicoes(cabecalho[0]).value == Requisicoes.LOGIN.value:
-            self.login(conexao, cabecalho)
-        elif Requisicoes(cabecalho[0]).value == Requisicoes.CADASTRO.value:
-            self.cadastro(conexao, cabecalho)
-        elif Requisicoes(cabecalho[0]).value == Requisicoes.SAQUE.value:
-            self.saque(conexao, cabecalho)
-        elif Requisicoes(cabecalho[0]).value == Requisicoes.DEPOSITO.value:
-            self.deposito(conexao, cabecalho)
-        elif Requisicoes(cabecalho[0]).value == Requisicoes.TRANSFERENCIA.value:
-            self.transferencia(conexao, cabecalho)
-        elif Requisicoes(cabecalho[0]).value == Requisicoes.CONSULTA_SALDO.value:
-            self.saldo_cliente(conexao, cabecalho)
+
+        self.LogicalClock += 1
+
+        if Requisicoes( cabecalho[0] ) == Requisicoes.LOGIN:
+            self.login( conexao, cabecalho)
+        elif Requisicoes( cabecalho[0] ) == Requisicoes.CADASTRO:
+            self.cadastro( conexao, cabecalho)
+        elif Requisicoes( cabecalho[0] ) == Requisicoes.SAQUE:
+            self.saque( conexao, cabecalho)
+        elif Requisicoes( cabecalho[0] ) == Requisicoes.DEPOSITO:
+            self.deposito( conexao, cabecalho)
+        elif Requisicoes( cabecalho[0] ) == Requisicoes.TRANSFERENCIA:
+            self.transferencia( conexao, cabecalho)
+        elif Requisicoes( cabecalho[0] ) == Requisicoes.CONSULTA_SALDO:
+            self.saldo_cliente( conexao, cabecalho)
         else:
             print("Algo deu errado | LOG")
     
@@ -78,21 +76,15 @@ class Server:
         """
         - Cadastra um novo cliente no banco
         """
-        cliente = Cliente(
-            nome=cabecalho[1],
-            rg=cabecalho[2],
-            senha=cabecalho[3])
-        criar_cliente(cliente)
-        sendString( conexao, Respostas.SUCCESS.value )
-
+        criar_cliente( ( cabecalho[1], cabecalho[2], cabecalho[3] ) )
+        sendString( conexao, f"{Respostas.SUCCESS.value}#{str(self.LogicalClock)}" )
 
     def saldo_cliente(self, conexao, cabecalho):
         """
         - Consulta o saldo do cliente
         """
         saldo = get_saldo(cabecalho[1])
-        sendString( conexao, Respostas.SUCCESS.value + '#' + str(saldo) )
-
+        sendString( conexao, f"{Respostas.SUCCESS.value}#{str(saldo)}#{str(self.LogicalClock)}" )
 
     def transferencia(self, conexao, cabecalho):
         """
@@ -104,14 +96,13 @@ class Server:
         saldo_atual = get_saldo(rg)
         saldo_atual_favorecido = get_saldo(rg_favorecido)
         if saldo_atual < valor:
-            sendString( conexao, Respostas.FORBIDDEN.value + '#' + 'Saldo insuficiente' )
+            sendString( conexao, f"{Respostas.FORBIDDEN.value}#Saldo insuficiente#{str(self.LogicalClock)}" )
         else:
             saldo_novo = saldo_atual - valor
             atualizar_saldo(saldo_novo, rg)
             saldo_novo_favorecido = saldo_atual_favorecido + valor
             atualizar_saldo(saldo_novo_favorecido, rg_favorecido)
-            sendString( conexao, Respostas.SUCCESS.value + '#' + str(saldo_novo) + '#' + str(saldo_novo_favorecido) )
-
+            sendString( conexao, f"{Respostas.SUCCESS.value}#{str(saldo_novo)}#{str(saldo_novo_favorecido)}#{str(self.LogicalClock)}" )
 
     def deposito(self, conexao, cabecalho):
         """
@@ -122,8 +113,7 @@ class Server:
         saldo_atual = get_saldo(rg)
         saldo_novo = saldo_atual + valor
         atualizar_saldo(saldo_novo, rg)
-        sendString( conexao, Respostas.SUCCESS.value + '#' + str(saldo_novo) )
-
+        sendString( conexao, f"{Respostas.SUCCESS.value}#{str(saldo_novo)}#{str(self.LogicalClock)}" )
 
     def saque(self, conexao, cabecalho):
         """
@@ -133,13 +123,11 @@ class Server:
         rg = cabecalho[2]
         saldo_atual = get_saldo(rg)
         if saldo_atual < valor:
-            sendString( conexao, Respostas.FORBIDDEN.value + '#' + 'Saldo insuficiente' )
+            sendString( conexao, f"{Respostas.FORBIDDEN.value}#Saldo insuficiente#{str(self.LogicalClock)}" )
         else:
             saldo_novo = saldo_atual - valor
             atualizar_saldo(saldo_novo, rg)
-            sendString( conexao, Respostas.SUCCESS.value + '#' + str(saldo_novo) )
-
-
+            sendString( conexao, f"{Respostas.SUCCESS.value}#{str(saldo_novo)}#{str(self.LogicalClock)}" )
 
     def login(self, conexao, cabecalho):
         """
@@ -147,23 +135,24 @@ class Server:
         """
         if not verifica_por_rg_senha(rg=cabecalho[1], senha=cabecalho[2]):
             cliente_nome, cliente_saldo = get_nome_cliente(rg=cabecalho[1])
-            sendString( conexao, Respostas.SUCCESS.value + '#' + cliente_nome + '#' + str(cliente_saldo) )
+            sendString( conexao, f"{Respostas.SUCCESS.value}#{cliente_nome}#{str(cliente_saldo)}#{str(self.LogicalClock)}" )
         else:
-            sendString( conexao, Respostas.FORBIDDEN.value, 'Dados de usuário incorretos' )
+            sendString( conexao, f"{Respostas.FORBIDDEN.value}#Dados de usuário incorretos#{str(self.LogicalClock)}" )
 
-    
     def Run(self):
         while True:
             client_socket, address = server_socket.accept()
             start_new_thread(self.gerenciar_cliente_thread, (client_socket, address))
-            cont_thread += 1
-            print("Evento: " + str(cont_thread) + " realizado.")
 
     def gerenciar_cliente_thread(self, conexao, _endereco):
-        sendString( conexao, Respostas.CONNECTED.value + '#' + str( self.LogicalClock ) )
+        self.LogicalClock += 1
+        sendString( conexao, f"{Respostas.CONNECTED.value}#{str( self.LogicalClock )}" )
         
         req = receiveString( conexao ).split('#')
+        self.LogicalClock = max( self.LogicalClock, int( req[-1] ) ) 
 
         self.manipula_requisicoes(req, conexao)
+
+        print(f"Relogio do servidor : {self.LogicalClock}")
 
         conexao.close()
