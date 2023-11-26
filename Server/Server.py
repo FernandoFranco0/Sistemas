@@ -10,49 +10,30 @@ from Utils.Respostas import Respostas
 from Repository.banco_de_dados import *
 from Utils.SocketUtils import *
 
-""" 
-AF_INET = Tipo da família de endereços, que no caso é o host:port
-SOCK_STREAM = O socket é do tipo TCP 
-"""
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 HOST = '127.0.0.1'
-"""
-Por convenção, adotaremos essa porta
-"""
 PORT = 1233
 cont_thread = 0
 
 criar_estrutura_banco()
 
-"""
-Liga o servidor via soquete, passando o endereço do host e a porta e faz o tratamento dos possíveis erros
-"""
+
+#Liga o servidor via soquete, passando o endereço do host e a porta e faz o tratamento dos possíveis erros
 try:
     server_socket.bind((HOST, PORT))
 except socket.error as error:
     print(str(error))
 
-"""
-Quantidade de conexões simultâneas que o socket aceita
-"""
+
+#Quantidade de conexões simultâneas que o socket aceita
 server_socket.listen(5)
-
-BUFFER_SIZE = 4096
-
 
 class Server:
     def __init__(self, ):
         self.LogicalClock = 0
 
     def manipula_requisicoes(self, cabecalho, conexao):
-        """
-        :param cabecalho:
-        :param conexao:
-        :return:
-        - Direciona o tipo de requisição
-        """
-
         self.LogicalClock += 1
 
         if Requisicoes( cabecalho[0] ) == Requisicoes.LOGIN:
@@ -71,27 +52,18 @@ class Server:
             print("Algo deu errado | LOG")
     
     def cadastro(self, conexao, cabecalho):
-        """
-        - Cadastra um novo cliente no banco
-        """
         self.LogicalClock += 1
         criar_cliente( ( cabecalho[1], cabecalho[2], cabecalho[3] ) )
         self.LogicalClock += 1
         sendString( conexao, f"{Respostas.SUCCESS.value}#{str(self.LogicalClock)}" )
 
     def saldo_cliente(self, conexao, cabecalho):
-        """
-        - Consulta o saldo do cliente
-        """
         self.LogicalClock += 1
         saldo = get_saldo(cabecalho[1])
         self.LogicalClock += 1
         sendString( conexao, f"{Respostas.SUCCESS.value}#{str(saldo)}#{str(self.LogicalClock)}" )
 
     def transferencia(self, conexao, cabecalho):
-        """
-        - Faz uma transferência entre conta de clientes do banco
-        """
         valor = float(cabecalho[1])
         rg = cabecalho[2]
         rg_favorecido = cabecalho[3]
@@ -113,9 +85,6 @@ class Server:
             sendString( conexao, f"{Respostas.SUCCESS.value}#{str(saldo_novo)}#{str(saldo_novo_favorecido)}#{str(self.LogicalClock)}" )
 
     def deposito(self, conexao, cabecalho):
-        """
-        - Faz a operação de depósito na conta do cliente
-        """
         valor = float(cabecalho[1])
         rg = cabecalho[2]
         self.LogicalClock += 1
@@ -127,9 +96,6 @@ class Server:
         sendString( conexao, f"{Respostas.SUCCESS.value}#{str(saldo_novo)}#{str(self.LogicalClock)}" )
 
     def saque(self, conexao, cabecalho):
-        """
-        - Faz a operação de saque para o cliente
-        """
         valor = float(cabecalho[1])
         rg = cabecalho[2]
         self.LogicalClock += 1
@@ -145,9 +111,6 @@ class Server:
             sendString( conexao, f"{Respostas.SUCCESS.value}#{str(saldo_novo)}#{str(self.LogicalClock)}" )
 
     def login(self, conexao, cabecalho):
-        """
-        - Faz o login de um usuário no contexto do sistema
-        """
         self.LogicalClock += 1
         if not verifica_por_rg_senha(rg=cabecalho[1], senha=cabecalho[2]):
             self.LogicalClock += 1
@@ -164,7 +127,7 @@ class Server:
             start_new_thread(self.gerenciar_cliente_thread, (client_socket, address))
 
     def gerenciar_cliente_thread(self, conexao, _endereco):
-        print(f"Conectado com: {_endereco[0]}:{_endereco[1]} Clock logico do servidor : {self.LogicalClock}")
+        print(f"Conectado com: {_endereco[0]}:{_endereco[1]} Clock logico do servidor : {self.LogicalClock} no começo da thread")
         self.LogicalClock += 1
         sendString( conexao, f"{Respostas.CONNECTED.value}#{str( self.LogicalClock )}" )
         
@@ -173,7 +136,7 @@ class Server:
 
         self.manipula_requisicoes(req, conexao)
 
-        print(f"Relogio do servidor : {self.LogicalClock}")
+        print(f"Relogio do servidor : {self.LogicalClock} no final da thread")
 
         conexao.close()
 

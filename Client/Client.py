@@ -5,7 +5,6 @@ from Utils.Respostas import Respostas
 from Utils.SocketUtils import *
 
 class Client:
-    BUFFER_SIZE = 4096
     MENSAGEM_ERRO_DESCONHECIDO = 'Erro desconhecido'
     MENSAGEM_SERVIDOR_SEM_RESPOSTA = 'Erro de conexão com o servidor: sem resposta'
     

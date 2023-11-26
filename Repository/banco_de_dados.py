@@ -12,11 +12,6 @@ CREATE_TABLE_CLIENTES = """
 
 
 def criar_estrutura_banco():
-    """
-    :return:
-
-    - Cria a estrutura do banco de dados
-    """
     with sql.connect('clientes.db') as con:
         cur = con.cursor()
         cur.execute('''SELECT count(name) FROM sqlite_master WHERE type='table' AND name='clientes' ''')
@@ -28,11 +23,6 @@ def criar_estrutura_banco():
 
 
 def cliente_existe_por_nome(nome_cliente):
-    """
-    :param nome_cliente:
-    :return: bool
-    - Verifica se há um cliente no banco pelo seu nome
-    """
     with sql.connect('clientes.db') as con:
         cur = con.cursor()
         exists = True
@@ -44,12 +34,6 @@ def cliente_existe_por_nome(nome_cliente):
 
 
 def criar_cliente(cliente):
-    """
-    :param cliente: Cliente
-    :return:
-
-    - Cria um cliente e persiste no banco
-    """
     print("Criacao de cliente")
     with sql.connect('clientes.db') as con:
         cur = con.cursor()
@@ -61,12 +45,6 @@ def criar_cliente(cliente):
 
 
 def verifica_por_rg_senha(rg, senha):
-    """
-    :param rg: str
-    :param senha: str
-    :return: bool
-    - Verifica se há um cliente que tem o mesmo rg e senha ao mesmo tempo no banco de dados
-    """
     with sql.connect('clientes.db') as con:
         cur = con.cursor()
         eh_habilitado = True
@@ -79,11 +57,6 @@ def verifica_por_rg_senha(rg, senha):
 
 
 def cliente_existe_por_rg(rg):
-    """
-    :param rg:
-    :return: bool
-    - Verifica se o cliente existe através do RG
-    """
     with sql.connect('clientes.db') as con:
         cur = con.cursor()
         existe = True
@@ -97,13 +70,7 @@ def cliente_existe_por_rg(rg):
 
         return existe
 
-
 def get_nome_cliente(rg):
-    """
-    :param rg: str
-    :return: str, str
-    - Obtem o nome do cliente através da consulta pelo seu rg
-    """
     with sql.connect('clientes.db') as con:
         cur = con.cursor()
         cur.execute(''' SELECT nome, saldo FROM clientes WHERE rg=? ''', (rg,))
@@ -112,12 +79,6 @@ def get_nome_cliente(rg):
 
 
 def get_saldo(rg):
-    """
-    :param rg: str
-    :return: float
-
-    - Consulta o saldo do cliente através de uma consulta pelo rg
-    """
     with sql.connect('clientes.db') as con:
         cur = con.cursor()
 
@@ -128,13 +89,6 @@ def get_saldo(rg):
 
 
 def atualizar_saldo(valor, rg):
-    """
-    :param valor: float
-    :param rg: str
-    :return:
-
-    - Atualiza o valor do saldo no caso de uma transação de saque, transferência ou depósito
-    """
     with sql.connect('clientes.db') as con:
         cur = con.cursor()
         cur.execute(''' UPDATE clientes SET saldo=? WHERE rg=? ''', (valor, rg,))
