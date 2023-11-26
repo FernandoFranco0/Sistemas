@@ -7,6 +7,9 @@
 import socket
 from _thread import *
 
+import sys, os
+sys.path.append('../')
+
 from Utils.Requisicoes import Requisicoes
 from Utils.Respostas import Respostas
 from Repository.banco_de_dados import *
@@ -145,6 +148,7 @@ class Server:
             start_new_thread(self.gerenciar_cliente_thread, (client_socket, address))
 
     def gerenciar_cliente_thread(self, conexao, _endereco):
+        print(f"Conectado com: {_endereco[0]}:{_endereco[1]} Clock logico do servidor : {self.LogicalClock}")
         self.LogicalClock += 1
         sendString( conexao, f"{Respostas.CONNECTED.value}#{str( self.LogicalClock )}" )
         
@@ -156,3 +160,7 @@ class Server:
         print(f"Relogio do servidor : {self.LogicalClock}")
 
         conexao.close()
+
+if __name__ == '__main__':
+    server = Server()
+    server.Run()

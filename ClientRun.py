@@ -2,8 +2,6 @@ from Client.Client import Client
 from Utils.Requisicoes import Requisicoes
 from Utils.Respostas import Respostas
 
-loggedIn = False
-
 def switch_main_menu(opcao : int):
     """
     - Faz uma requisição ao servidor para encontrar o cliente na base de dados
@@ -25,15 +23,14 @@ def switch_main_menu(opcao : int):
         client = Client(rg_cliente,senha_cliente)
         resposta_requisicao, mensagem = client.requisicao_login()
         if resposta_requisicao == Respostas.SUCCESS:
-            loggedIn = True
-            return True, client
+            return True, client, True
         else:
             print(f"{resposta_requisicao} {mensagem}")
 
     else:
-        return False
+        return False, None, False
     
-    return True
+    return True, None, False
 
 def switch_operacao(operacao : str, client : Client):
     """
@@ -60,12 +57,15 @@ def switch_operacao(operacao : str, client : Client):
         print(f"Transferência com valor de {str(valor_transferencia)} feita de: {client.rg} para: {rg_destino}. Novo Saldo: {str(novo_saldo)}.")
 
     else:
-        loggedIn = False
+        return False
+    
+    return True
 
 
 if __name__ == '__main__':
 
     continuar = True
+    loggedIn = False
 
     while continuar:
         if loggedIn:
@@ -77,7 +77,7 @@ if __name__ == '__main__':
             print("Outro - Sai da Sessão")
             operacao_desejada = input("Opção: ")
 
-            switch_operacao(operacao_desejada, loggedClient)
+            loggedIn  = switch_operacao(operacao_desejada, loggedClient )
         else: 
             print("Digite o número do que deseja fazer: ")
             print("1 - Login")
@@ -85,7 +85,7 @@ if __name__ == '__main__':
             print("Outro - Sair")
             operacao_desejada = input("Opção: ")
             
-            continuar, loggedClient = switch_main_menu(operacao_desejada)
+            continuar, loggedClient, loggedIn = switch_main_menu(operacao_desejada)
             
         if( loggedClient ):
             print(f"Relogio do client com rg {loggedClient.rg} : {loggedClient.LogicalClock}")
