@@ -1,8 +1,3 @@
-"""
-@author: Álvaro Souza Oliveira
-@author: Carlos Mosselman Cabral Neto
-@author: Vanessa Machado Araújo
-"""
 import sqlite3 as sql
 
 CREATE_TABLE_CLIENTES = """

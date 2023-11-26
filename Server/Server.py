@@ -1,8 +1,3 @@
-"""
-@author: Álvaro Souza Oliveira
-@author: Carlos Mosselman Cabral Neto
-@author: Vanessa Machado Araújo
-"""
 
 import socket
 from _thread import *
@@ -79,14 +74,18 @@ class Server:
         """
         - Cadastra um novo cliente no banco
         """
+        self.LogicalClock += 1
         criar_cliente( ( cabecalho[1], cabecalho[2], cabecalho[3] ) )
+        self.LogicalClock += 1
         sendString( conexao, f"{Respostas.SUCCESS.value}#{str(self.LogicalClock)}" )
 
     def saldo_cliente(self, conexao, cabecalho):
         """
         - Consulta o saldo do cliente
         """
+        self.LogicalClock += 1
         saldo = get_saldo(cabecalho[1])
+        self.LogicalClock += 1
         sendString( conexao, f"{Respostas.SUCCESS.value}#{str(saldo)}#{str(self.LogicalClock)}" )
 
     def transferencia(self, conexao, cabecalho):
@@ -96,15 +95,21 @@ class Server:
         valor = float(cabecalho[1])
         rg = cabecalho[2]
         rg_favorecido = cabecalho[3]
+        self.LogicalClock += 1
         saldo_atual = get_saldo(rg)
+        self.LogicalClock += 1
         saldo_atual_favorecido = get_saldo(rg_favorecido)
         if saldo_atual < valor:
+            self.LogicalClock += 1
             sendString( conexao, f"{Respostas.FORBIDDEN.value}#Saldo insuficiente#{str(self.LogicalClock)}" )
         else:
             saldo_novo = saldo_atual - valor
+            self.LogicalClock += 1
             atualizar_saldo(saldo_novo, rg)
             saldo_novo_favorecido = saldo_atual_favorecido + valor
+            self.LogicalClock += 1
             atualizar_saldo(saldo_novo_favorecido, rg_favorecido)
+            self.LogicalClock += 1
             sendString( conexao, f"{Respostas.SUCCESS.value}#{str(saldo_novo)}#{str(saldo_novo_favorecido)}#{str(self.LogicalClock)}" )
 
     def deposito(self, conexao, cabecalho):
@@ -113,9 +118,12 @@ class Server:
         """
         valor = float(cabecalho[1])
         rg = cabecalho[2]
+        self.LogicalClock += 1
         saldo_atual = get_saldo(rg)
         saldo_novo = saldo_atual + valor
+        self.LogicalClock += 1
         atualizar_saldo(saldo_novo, rg)
+        self.LogicalClock += 1
         sendString( conexao, f"{Respostas.SUCCESS.value}#{str(saldo_novo)}#{str(self.LogicalClock)}" )
 
     def saque(self, conexao, cabecalho):
@@ -124,22 +132,30 @@ class Server:
         """
         valor = float(cabecalho[1])
         rg = cabecalho[2]
+        self.LogicalClock += 1
         saldo_atual = get_saldo(rg)
         if saldo_atual < valor:
+            self.LogicalClock += 1
             sendString( conexao, f"{Respostas.FORBIDDEN.value}#Saldo insuficiente#{str(self.LogicalClock)}" )
         else:
             saldo_novo = saldo_atual - valor
+            self.LogicalClock += 1
             atualizar_saldo(saldo_novo, rg)
+            self.LogicalClock += 1
             sendString( conexao, f"{Respostas.SUCCESS.value}#{str(saldo_novo)}#{str(self.LogicalClock)}" )
 
     def login(self, conexao, cabecalho):
         """
         - Faz o login de um usuário no contexto do sistema
         """
+        self.LogicalClock += 1
         if not verifica_por_rg_senha(rg=cabecalho[1], senha=cabecalho[2]):
+            self.LogicalClock += 1
             cliente_nome, cliente_saldo = get_nome_cliente(rg=cabecalho[1])
+            self.LogicalClock += 1
             sendString( conexao, f"{Respostas.SUCCESS.value}#{cliente_nome}#{str(cliente_saldo)}#{str(self.LogicalClock)}" )
         else:
+            self.LogicalClock += 1
             sendString( conexao, f"{Respostas.FORBIDDEN.value}#Dados de usuário incorretos#{str(self.LogicalClock)}" )
 
     def Run(self):
