@@ -1,22 +1,19 @@
 import sqlite3 as sql
 
-CREATE_TABLE_CLIENTES = """
-        CREATE TABLE if not exists clientes (
-            id  INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-            nome    TEXT NOT NULL,
-            rg  VARCHAR(13) NOT NULL,
-            senha VARCHAR(6),
-            saldo   REAL
-            );
-        """
-
-
 def criar_estrutura_banco():
     with sql.connect('clientes.db') as con:
         cur = con.cursor()
         cur.execute('''SELECT count(name) FROM sqlite_master WHERE type='table' AND name='clientes' ''')
         if cur.fetchone()[0] != 1:
-            cur.execute(CREATE_TABLE_CLIENTES)
+            cur.execute("""
+                        CREATE TABLE if not exists clientes (
+                            id  INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                            nome    TEXT NOT NULL,
+                            rg  VARCHAR(13) NOT NULL,
+                            senha VARCHAR(6),
+                            saldo   REAL
+                            );
+                        """)
         if not cliente_existe_por_nome('adm'):
             cur.execute("INSERT INTO clientes(nome, rg, senha, saldo) VALUES ('adm', '11.111.111-11', '123456', 0)")
         con.commit()

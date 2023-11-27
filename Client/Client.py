@@ -23,6 +23,8 @@ class Client:
                
                 resposta = receiveString( client_socket ).split('#')
                 self.LogicalClock = max( self.LogicalClock, int( resposta[-1] ) )
+                if self.LogicalClock == int( resposta[-1] ):
+                    print(f"Novo valor do clock vindo do servidor: {self.LogicalClock}", end='\n\n')
                 
                 if Respostas( resposta[0] ) == Respostas.CONNECTED:
 
@@ -55,7 +57,9 @@ class Client:
                 
                 resposta = receiveString( client_socket ).split('#')
                 self.LogicalClock = max( self.LogicalClock, int( resposta[-1] ) )
-                
+                if self.LogicalClock == int( resposta[-1] ):
+                    print(f"Novo valor do clock vindo do servidor: {self.LogicalClock}", end='\n\n')
+
                 if Respostas( resposta[0] ) == Respostas.CONNECTED:
 
                     request = Requisicoes.LOGIN.value + '#' + self.rg + '#' + self.senha
@@ -91,7 +95,10 @@ class Client:
                
                 resposta = receiveString( client_socket ).split('#')
                 self.LogicalClock = max( self.LogicalClock, int( resposta[-1] ) )
-                
+                if self.LogicalClock == int( resposta[-1] ):
+                    print(f"Novo valor do clock vindo do servidor: {self.LogicalClock}", end='\n\n')
+
+
                 if Respostas( resposta[0] ) == Respostas.CONNECTED:
 
                     request = Requisicoes.SAQUE.value + '#' + str(valor) + '#' + self.rg
@@ -125,7 +132,9 @@ class Client:
                 
                 resposta = receiveString( client_socket ).split('#')
                 self.LogicalClock = max( self.LogicalClock, int( resposta[-1] ) )
-                
+                if self.LogicalClock == int( resposta[-1] ):
+                    print(f"Novo valor do clock vindo do servidor: {self.LogicalClock}", end='\n\n')
+
                 if Respostas( resposta[0] ) == Respostas.CONNECTED:
 
                     request = Requisicoes.DEPOSITO.value + '#' + str(valor) + '#' + self.rg
@@ -159,6 +168,8 @@ class Client:
 
                 resposta = receiveString( client_socket ).split('#')
                 self.LogicalClock = max( self.LogicalClock, int( resposta[-1] ) )
+                if self.LogicalClock == int( resposta[-1] ):
+                    print(f"Novo valor do clock vindo do servidor: {self.LogicalClock}", end='\n\n')
 
                 if Respostas( resposta[0] ) == Respostas.CONNECTED:
 
@@ -192,7 +203,9 @@ class Client:
                 
                 resposta = receiveString( client_socket ).split('#')
                 self.LogicalClock = max( self.LogicalClock, int( resposta[-1] ) )
-                
+                if self.LogicalClock == int( resposta[-1] ):
+                    print(f"Novo valor do clock vindo do servidor: {self.LogicalClock}", end='\n\n')
+
                 if Respostas( resposta[0] ) == Respostas.CONNECTED:
 
                     request = Requisicoes.CONSULTA_SALDO.value + '#' + self.rg
@@ -214,11 +227,15 @@ class Client:
             
     def request(self,  request : str , clientSocket : socket ):
         self.LogicalClock += 1
+        
+        print(f"Novo valor do clock: {self.LogicalClock}", end='\n\n')
 
         sendString( clientSocket, request + '#' + str( self.LogicalClock ) ) 
         
         resposta = receiveString( clientSocket )
         resposta = resposta.split('#')
         self.LogicalClock = max( self.LogicalClock, int( resposta[-1] ) )
+        if self.LogicalClock == int( resposta[-1] ):
+            print(f"Novo valor do clock vindo do servidor: {self.LogicalClock}", end='\n\n')
 
         return resposta
