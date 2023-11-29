@@ -9,3 +9,9 @@ class Requisicoes(Enum):
     CONSULTA_SALDO = '5'
     TRANSFERENCIA = '6'
     OBTER_LISTA_CLIENTES = '7'
+
+class Respostas(Enum):
+    INTERNAL_ERROR = '0'
+    CONNECTED = '1'
+    SUCCESS = '2'
+    FORBIDDEN = '3'

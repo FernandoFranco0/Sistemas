@@ -1,6 +1,6 @@
 from Client.Client import Client
-from Utils.Requisicoes import Requisicoes
-from Utils.Respostas import Respostas
+from Utils.Consts import Requisicoes
+from Utils.Consts import Respostas
 
 def switch_main_menu(opcao : int):
     """

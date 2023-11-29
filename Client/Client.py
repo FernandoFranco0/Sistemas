@@ -1,14 +1,14 @@
 import socket
 
-from Utils.Requisicoes import Requisicoes
-from Utils.Respostas import Respostas
+from Utils.Consts import Requisicoes
+from Utils.Consts import Respostas
 from Utils.SocketUtils import *
 
 class Client:
     MENSAGEM_ERRO_DESCONHECIDO = 'Erro desconhecido'
     MENSAGEM_SERVIDOR_SEM_RESPOSTA = 'Erro de conexão com o servidor: sem resposta'
     
-    def __init__(self, rg, senha, nome = "", host='127.0.0.1', port=1233):
+    def __init__(self, rg, senha, nome = "", host='127.0.0.1', port=5002):
         self.rg = rg
         self.senha = senha
         self.nome = nome
@@ -17,6 +17,9 @@ class Client:
         self.LogicalClock = 0
 
     def requisicao_cadastro(self):
+        """
+        Contecta-se com o servidor e faz uma requisição para cadastrar um novo cliente
+        """
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             try:
                 client_socket.connect( (self.host, self.port) )
@@ -48,8 +51,6 @@ class Client:
     def requisicao_login(self):
         """
         Contecta-se com o servidor e faz uma requisição para validar o usuário para fazer o login na aplicação
-        rg: rg do usuário
-        senha: senha do usuário
         """
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             try:
@@ -87,7 +88,6 @@ class Client:
         """
         Contecta-se com o servidor e faz uma requisição para realizar o saque
         valor: valor que será retirado
-        rg: rg do cliente que está realizando a ação
         """
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             try:
@@ -124,7 +124,6 @@ class Client:
         """
         Contecta-se com o servidor e faz uma requisição para realiazr o depósito
         valor: valor que será adicionado à conta
-        rg: rg do cliente que receberá o valor
         """
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             try:
@@ -226,6 +225,10 @@ class Client:
                 return (Respostas.INTERNAL_ERROR, str(error))
             
     def request(self,  request : str , clientSocket : socket ):
+        """
+        Envia uma requisição para o servidor e retorna a resposta
+        request: requisição que será enviada
+        """
         self.LogicalClock += 1
         
         print(f"Novo valor do clock: {self.LogicalClock}", end='\n\n')

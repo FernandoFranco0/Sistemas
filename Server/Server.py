@@ -2,18 +2,18 @@
 import socket
 from _thread import *
 
-import sys, os
+import sys
 sys.path.append('../')
 
-from Utils.Requisicoes import Requisicoes
-from Utils.Respostas import Respostas
-from Repository.banco_de_dados import *
+from Utils.Consts import Requisicoes
+from Utils.Consts import Respostas
+from Repository.db import *
 from Utils.SocketUtils import *
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 HOST = '127.0.0.1'
-PORT = 1233
+PORT = 5002
 cont_thread = 0
 
 criar_estrutura_banco()
