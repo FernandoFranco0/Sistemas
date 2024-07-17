@@ -7,7 +7,7 @@ sys.path.append('../')
 
 from Utils.Consts import Requisicoes
 from Utils.Consts import Respostas
-from Repository.db import *
+from Utils.db import *
 from Utils.SocketUtils import *
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
